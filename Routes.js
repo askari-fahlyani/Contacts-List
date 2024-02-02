@@ -1,8 +1,9 @@
 import express from "express";
-import { formatContactsListHandler, loadContacts } from './services.js'
+import {contactsList} from './index.js'
+
+import { formatContactsListHandler, loadContacts,saveContactsList,generateNewContactId } from './services.js'
 
 const router = express.Router()
-const contactsList = []
 
 router.get('/',(req,res)=>{
     if(req.query.format){
@@ -14,12 +15,39 @@ router.get('/',(req,res)=>{
     console.log('im here');
     res.send(contactsList)
 })
-const main = async ()=>{
-    const loadedContacts = await loadContacts()
-    contactsList.push(...loadedContacts)
-    
-}
-await main()
+router.post('/new',(req,res)=>{
+    const {firstName,lastName} = req.body;
+    const id = generateNewContactId(contactsList)
+    const newContect = {
+        id:id,
+        firstName:firstName,
+        lastName:lastName
+    }
+    contactsList.push(newContect)
+    saveContactsList(contactsList)
+    res.send('contact saved')
+})
+router.delete('/:id',(req,res)=>{
+    if (contactsList.length<1) {
+        res.status(400).send({
+            message:'there is no contact in the list'
+        })
+        return
+    }
+    const contantIndex = contactsList.findIndex(({id})=>id===Number(req.params.id))
+    console.log('delete index is',contantIndex);
+    if (contantIndex<0) {
+        res.status(400).send({
+            message:'invalid Id'
+        })
+        return
+    }
+        contactsList.splice(contantIndex,1)
+        saveContactsList(contactsList)
+        res.send(`Contact #${req.params.id} deleted`)
+
+})
+
 
 
 export default router

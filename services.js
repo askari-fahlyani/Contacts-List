@@ -1,7 +1,5 @@
 import fs from 'fs/promises'
-// import {contactsList} from './cli.mjs'
 const CONTACTS_lIST_FILE_PATH ='./data-contacts-list.json'
-const contactsList = []
 export const loadContacts = async()=>{
     try {
         const myData = await fs.readFile(CONTACTS_lIST_FILE_PATH,'utf-8')
@@ -26,7 +24,7 @@ export const loadContacts = async()=>{
         return contactsList.map(({id, firstName, lastName}) => `#${id} ${firstName} ${lastName}`).join('\n');
     }
 
-   export const generateNewContactId = ()=>{
+   export const generateNewContactId = (contactsList)=>{
        const lastContact = contactsList[contactsList.length-1]
        const id = lastContact ? lastContact.id+ 1:0 ;
         return id
