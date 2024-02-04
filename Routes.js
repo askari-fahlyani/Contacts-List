@@ -34,18 +34,48 @@ router.delete('/:id',(req,res)=>{
         })
         return
     }
-    const contantIndex = contactsList.findIndex(({id})=>id===Number(req.params.id))
-    console.log('delete index is',contantIndex);
-    if (contantIndex<0) {
+    console.log("params id",req.params.id);
+    console.log('contact list',contactsList);
+    const contactIndex = contactsList.findIndex(({id})=>id===Number(req.params.id))
+    console.log('delete index is',contactIndex);
+    if (contactIndex<0) {
         res.status(400).send({
             message:'invalid Id'
         })
         return
     }
-        contactsList.splice(contantIndex,1)
+        contactsList.splice(contactIndex,1)
         saveContactsList(contactsList)
         res.send(`Contact #${req.params.id} deleted`)
 
+})
+
+router.put('/:id',(req,res)=>{
+  if(contactsList.length<1){
+    res.status(400).send({
+        message:'there is no any contact i contacts List'
+    })
+    return
+  }
+  const contactIndex = contactsList.findIndex(({id})=>id===Number(req.params.id))
+  console.log('contact index is ',contactIndex);
+  if(contactIndex<0){
+    res.status(400).send({
+        message:"invalid Id"
+    })
+    return
+  }
+  const {firstName,lastName} = req.body
+  const contact = contactsList[contactIndex]
+  console.log('contact is',contact);
+  const updatedContact = {
+    ...contact,
+    firstName:firstName||contact.firstName,
+    lastName:lastName||contact.lastName
+  }
+  contactsList.splice(contactIndex,1,updatedContact)
+  saveContactsList(contactsList)
+  res.send({message:`updated contact is ${updatedContact.firstName} ${updatedContact.lastName}`})
 })
 
 
