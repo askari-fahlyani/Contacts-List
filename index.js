@@ -2,6 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser';
 import router from './Routes.js';
 import { generateNewContactId,loadContacts,saveContactsList } from './services.js';
+import { sequelize } from './models/index.js';
 
 const app = express();
 export const contactsList = []
@@ -10,7 +11,11 @@ const loggerMiddleware = (req,resp,next)=>{
     console.log('request',req.method,req.url);
     next()
 }
-
+try{
+    await sequelize.sync({alter:true})
+}catch(error){
+    console.log(error);
+}
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(loggerMiddleware)
 app.use(router)
